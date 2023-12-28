@@ -1,0 +1,49 @@
+' © 2023, Stephen DeVoy, All rights reserved.
+
+GraphicsWindow.BackgroundColor = "Yellow"
+GraphicsWindow.FontName = "Arial"
+GraphicsWindow.FontSize = 12
+GraphicsWindow.FontBold = "true"
+GraphicsWindow.PenColor = "Blue"
+
+
+tableCellWidth = 40
+tableCellHeight = 40
+
+
+continue = "True"
+
+
+While continue = "True"
+  TextWindow.WriteLine("Enter the size of your multiplication table: (enter an integer greater than 0 and less than 20) ")
+  userInput = TextWindow.Read()
+  n = userInput
+
+
+  DrawMultiplicationTable()
+
+
+  TextWindow.WriteLine("Create another? (Y/N)")
+  userInput = TextWindow.Read()
+
+
+  If userInput = "Y" Or userInput = "y" Then
+      continue = "True"
+  Else
+      continue = "False"
+  EndIf
+EndWhile
+
+
+Sub DrawMultiplicationTable
+  GraphicsWindow.Clear()
+  For y = 1 to n
+      For x = 1 to n
+          product = x * y
+     	  xDrawingPosition = tableCellWidth * x
+     	  yDrawingPosition = tableCellHeight * y
+          GraphicsWindow.DrawText(xDrawingPosition, yDrawingPosition, product)
+      EndFor
+  EndFor
+EndSub
+
