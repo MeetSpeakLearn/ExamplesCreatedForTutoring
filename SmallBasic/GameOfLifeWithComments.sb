@@ -1,0 +1,206 @@
+' Initialize the GraphicsWindow object.
+
+GraphicsWindow.BackgroundColor = "Brown"
+GraphicsWindow.FontName = "Arial"
+GraphicsWindow.FontSize = 18
+GraphicsWindow.FontBold = "true"
+GraphicsWindow.BrushColor = "#FFFFFF"
+
+
+' The top left corner of the grid portion of our display
+' will be positioned at (10, 20).
+
+gridX = 10
+gridY = 20
+
+' We will display information about the current generation in
+' the top left corner of our display. The variable "generation"
+' will be incremented every time a new generation passes.
+
+generation = 1
+
+' Our grid is only 40 x 40 cells. A Quick Journey Through Small Basic
+' relies on use of Small Basic's web-portal, which is slow and resource
+' intensive. For this reason, we use a small grid. However, if you are
+' running your Small Basic code using the desktop application, much larger
+' values for "columns" and "rows" will work. 
+
+columns = 40
+rows = 40
+
+
+' Within our grid, every cells has a value of 1 or 0. We represent
+' a living cell with 1 and a dead cell with 0. Below, we assign these
+' values to variables with meaningful names, in order to make our
+' code easier to read AND to provide a place for curious students to
+' add additional states, give them names, and use other values.
+
+DEAD = 0
+ALIVE = 1
+
+
+' We initialize the grid by chosing random coordinates and setting their
+' initial state to ALIVE. In the statement below, on the right hand side
+' of the assignment, we compute an integer that is approximately 1/3 of
+' the number of cells. By changing the right hand side of the assigment
+' statement below, you can increase or decrease the number of random cells
+' that will be set to ALIVE when the game begins. You may also wish to
+' modify this program to ask the user to decide what percentage of the
+' grid should be seeded with life.
+
+HowMuchLife = Math.Floor(columns * rows / 3)
+
+' Before we seed the grid with life, we make sure that every cell is dead.
+
+For row = 1 to rows
+    For column = 1 to columns
+        state[row][column] = DEAD
+    EndFor
+EndFor
+
+
+' "tableCellWidth" and "tableCellHeight" are used to compute the position of
+' graphics indicating the state of a cell. We have chosen to use a 10 x 10
+' portion of the screen for each cell.
+
+tableCellWidth = 10
+tableCellHeight = 10
+
+
+' "continue" is used to record the user's choices about whether or not
+' to continue what we are currently doing. For reasons unknown to me
+' Small Basic's boolean variables do not work. For this reason, we use
+' a string whose values range are "True" and "False" to record this
+' intent.
+
+continue = "True"
+
+
+' "userPrompt" is used by the subroutine "GetUserInput" to prompt the
+' user for input. Based on that input, "GetUserInput" sets the variable
+' "continue" to the user's intent.
+
+userPrompt = "Run Game of Life?"
+GetUserInput()
+
+' While the user's intent is to continue, run the code in the body of this loop.
+
+While continue = "True"
+  GraphicsWindow.Show()               ' Show the graphics window.
+  LetThereBeLife()                    ' Initialize the grid.
+  While continue = "True"             ' While the user desires it...
+    DrawState()                         ' Draw the grid.
+    NextGeneration()                    ' Compute next generation.
+    userPrompt = "Next Generation?"     ' Get user's desire.
+    GetUserInput()
+  EndWhile
+  userPrompt = "Run Game of Life?"    ' Get user's desire.
+  GetUserInput()
+EndWhile
+
+' The lack of parameters to subroutines makes input in Small Basic
+' awkward. We try as best we can to confine our input to our
+' GetUserInput subroutine. The subroutine depends upon the variable
+' "userPrompt" holding a string of text which is to be used as
+' a prompt.
+
+Sub GetUserInput
+  TextWindow.WriteLine(userPrompt)
+  userInput = TextWindow.Read()
+  If userInput = "Y" Or userInput = "y" Then
+    continue = "True"                        ' User desires to continue.
+  Else
+    continue = "False"                       ' User desires to abort.
+  EndIf
+EndSub
+
+' Seeds the grid with life.
+
+Sub LetThereBeLife
+    For i = 1 to HowMuchLife
+        row = Math.GetRandomNumber(rows)
+        column = Math.GetRandomNumber(columns)
+        state[row][column] = ALIVE
+    EndFor
+EndSub
+
+' "CountNeighbors" wanders around a cell counting living neighbors.
+' Records the number of living neighbors for each cell
+' in the two dimensional array "stateAssessment".
+
+Sub CountNeighbors
+    ' Relies on currentRow and currentColumn having been set before executing this subroutine.
+    ' The count is returned by setting the variable neighborCount.
+    left = Math.Max(0, currentColumn - 1)
+    right = Math.Min(columns, currentColumn + 1)
+    top = Math.Max(0, currentRow - 1)
+    bottom = Math.Min(rows, currentRow + 1)
+    neighborCount = 0
+    For cnRow = top to bottom
+        For cnColumn = left to right
+            If cnRow <> currentRow And cnColumn <> currentColumn Then
+                If state[cnRow][cnColumn] = ALIVE Then
+                    neighborCount = neighborCount + 1
+                EndIf
+            EndIf
+        EndFor
+    EndFor
+EndSub
+
+' Produces the next state of the array "state".
+' "NextGeneration" is where all of the logic for producing
+' the next generation is employed.
+
+Sub NextGeneration
+
+  ' For each cell in "state", compute and store its
+  ' neighbor count.
+
+  For row = 1 to rows
+    currentRow = row
+    For column = 1 to columns
+      currentColumn = column
+      CountNeighbors()
+      stateAssessment[row][column] = neighborCount
+    EndFor
+  EndFor
+
+  ' For every cell in "state", update the cell's state according
+  ' to the rules of the game.
+
+  For row = 1 to rows
+    For column = 1 to columns
+      assessment = stateAssessment[row][column]
+      If state[row][column] = ALIVE Then
+        If assessment < 2 Then
+          state[row][column] = DEAD
+        ElseIf assessment = 2 Or assessment = 3 Then
+          state[row][column] = ALIVE
+	ElseIf assessment >= 3 Then
+	  state[row][column] = DEAD
+        EndIf
+      ElseIf assessment = 3 Then
+        state[row][column] = ALIVE
+      EndIf
+    EndFor
+  EndFor
+  generation = generation + 1
+EndSub
+
+' Draw the state on the graphics window.
+Sub DrawState
+  GraphicsWindow.Clear()
+  GraphicsWindow.DrawText(0, 0, "Generation: " + generation)
+  For y = 1 to rows
+      For x = 1 to columns
+     	   xDrawingPosition = tableCellWidth * x
+           yDrawingPosition = tableCellHeight * y
+           If (state[y][x] = ALIVE) Then
+                symbol = "*"
+           Else
+                symbol = " "
+           EndIf
+           GraphicsWindow.DrawText(gridX + xDrawingPosition, gridY + yDrawingPosition, symbol)
+      EndFor
+  EndFor
+EndSub
