@@ -102,7 +102,7 @@ Sub NextGeneration
           state[row][column] = DEAD
         ElseIf assessment = 2 Or assessment = 3 Then
           state[row][column] = ALIVE
-	ElseIf essessment >= 3 Then
+	ElseIf assessment >= 3 Then
 	  state[row][column] = DEAD
         EndIf
       ElseIf assessment = 3 Then
