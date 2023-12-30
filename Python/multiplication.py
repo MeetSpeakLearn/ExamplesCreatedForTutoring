@@ -145,7 +145,7 @@ def gradeSchoolMultiplication(multiplicands: list) -> list:
             return product
 
 affirmativeReplies = ["y", "Y", "yes", "Yes"]
-outerPrompt = "Would you like multiple some numbers? "
+outerPrompt = "Would you like to multiply some numbers? "
 innerPrompt = "Type a non negative integer or type 'end': "
     
 
