@@ -1,3 +1,5 @@
+' © 2023, Stephen DeVoy, All rights reserved.
+
 ' Initialize the GraphicsWindow object.
 
 GraphicsWindow.BackgroundColor = "Brown"
