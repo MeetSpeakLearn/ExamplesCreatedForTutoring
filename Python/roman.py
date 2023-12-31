@@ -25,9 +25,35 @@
 # I do not follow that path is to deflect criticism that this solution wouldn't reflect 
 # a true understanding of how Roman numerals work.
 
-romanTokens = ["M", "D", "C", "L", "X", "V", "I"]       # All valid numerals
-romanTokenValues = [1000, 500, 100, 50, 10, 5, 1]       # The value of each numeral in the same position in romanTokens
+romanTokens = [{"symbol" : "M",
+                "value" : 1000,
+                "maxRep" : -1},
+               {"symbol" : "D",
+                "value" : 500,
+                "maxRep" : 1},
+               {"symbol" : "C",
+                "value" : 100,
+                "maxRep" : 3},
+               {"symbol" : "L",
+                "value" : 50,
+                "maxRep" : 1},
+               {"symbol" : "X",
+                "value" : 10,
+                "maxRep" : 3},
+               {"symbol" : "V",
+                "value" : 5,
+                "maxRep" : 1},
+               {"symbol" : "I",
+                "value" : 1,
+                "maxRep" : 3}]
+
 romanMetaTokens = ["CM", "CD", "XL", "IX", "IV"]        # Numeral pairs seen as single tokens
+
+def getTokenInfo(name: str):
+    for info in romanTokens:
+        if info["symbol"] == name:
+            return info
+    return None
 
 # parsed is a value that can be found in a tokenized list of Roman numerals.
 # parsed must either be a string whose value can be looked up in romanTokens,
@@ -35,15 +61,17 @@ romanMetaTokens = ["CM", "CD", "XL", "IX", "IV"]        # Numeral pairs seen as 
 # evalRomanToken returns the value of the token.
 def evalRomanToken(parsed) -> int:
     if isinstance(parsed, str):
-        if parsed in romanTokens:
-            return romanTokenValues[romanTokens.index(parsed)]
-        else:
-            print(parsed + " is not a valid Roman numeral.")
+        info = getTokenInfo(parsed)
+        if info is None:
+            print(parsed + " is not a value Roman numeral.")
             return 0
+        return info["value"]
     elif isinstance(parsed, list):
         if (len(parsed) == 2):
             if isinstance(parsed[0], str) and isinstance(parsed[1], str):
-                return evalRomanToken(parsed[1]) - evalRomanToken(parsed[0])
+                leftInfo = getTokenInfo(parsed[0])
+                rightInfo = getTokenInfo(parsed[1])
+                return rightInfo["value"] - leftInfo["value"]
             else:
                 print("Malformed meta token: " + ", ".join(parsed, ))
                 return 0
@@ -59,9 +87,31 @@ def evalRomanToken(parsed) -> int:
 # finds their values in romanTokenValues, and subtracts the first from the second, adding
 # the difference result. After summing up all of the parts, the sum is returned as the value.
 def evalRomanTokenList(parsed: list) -> int:
+    info = getTokenInfo("M")
+    level: int = info["value"]
+    allowedOccurances: int = info["maxRep"]
+    occurances = 0
     result: int = 0
     for token in parsed:
-        result += evalRomanToken(token)
+        value = evalRomanToken(token)
+        if (value == level):
+            occurances += 1
+            if (allowedOccurances != -1):
+                if (occurances > allowedOccurances):
+                    print(f"Numeral {token} occurs more than the allowed number of times.")
+                    return 0
+        elif (value > level):
+            print(f"Numeral {token} is out of place.")
+            return 0
+        else:
+            occurances = 1
+            level = value
+            info = getTokenInfo(token)
+            if info is None:
+                allowedOccurances = 1
+            else:
+                allowedOccurances = info["maxRep"]
+        result += value
     return result
 
 # Given a valid metatoken (i.e. text must be an element of romanMetaTokens), it returns a list
@@ -79,7 +129,8 @@ def tokenizeRoman(text: str) -> list:
     
     if (charCount == 0): return []
     elif (charCount == 1):
-        if text in romanTokens: return [text]
+        info = getTokenInfo(text)
+        if info: return [text]
         else:
             print(text + " is not a valid Roman numeral.")
             return []
@@ -88,10 +139,15 @@ def tokenizeRoman(text: str) -> list:
             rest = tokenizeRoman(text[2:])
             rest.insert(0, destructMetaToken(text[0:2]))
             return rest
-        elif text[0:1] in romanTokens:
-            rest = tokenizeRoman(text[1:])
-            rest.insert(0, text[0:1])
-            return rest
+        else:
+            info = getTokenInfo(text[0:1])
+            if info:
+                rest = tokenizeRoman(text[1:])
+                rest.insert(0, text[0:1])
+                return rest
+            else:                
+                print(text[0:1] + " is not a valid Roman numeral.")
+                return []
         
 userInput = input("Enter a number using Roman Numerals: ")
 tokenList = tokenizeRoman(userInput)
