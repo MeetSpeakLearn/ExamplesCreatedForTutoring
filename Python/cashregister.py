@@ -121,8 +121,30 @@ USDollars.addNoteOrCoin("Quarter", 25, NoteOrCoin.COIN)
 USDollars.addNoteOrCoin("Dime", 10, NoteOrCoin.COIN)
 USDollars.addNoteOrCoin("Nickle", 5, NoteOrCoin.COIN)
 USDollars.addNoteOrCoin("Penny", 1, NoteOrCoin.COIN)
+        
+Euros = Currency(100)
+Euros.addNoteOrCoin("Five Hundred Euro Note", 50000, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Two Hundred Euro Note", 20000, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("One Hundred Euro Note", 10000, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Fifty Euro Note", 5000, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Twenty Euro Note", 2000, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Ten Euro Note", 1000, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Five Euro Note", 500, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Two Euro Coin", 200, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("One Euro Coin", 100, NoteOrCoin.NOTE)
+Euros.addNoteOrCoin("Half Euro Coin", 50, NoteOrCoin.COIN)
+Euros.addNoteOrCoin("Twenty Euro Cents Coin", 20, NoteOrCoin.COIN)
+Euros.addNoteOrCoin("Ten Euro Cents Coin", 10, NoteOrCoin.COIN)
+Euros.addNoteOrCoin("Five Euro Cents Coin", 5, NoteOrCoin.COIN)
+Euros.addNoteOrCoin("Two Euro Cents Coin", 2, NoteOrCoin.COIN)
+Euros.addNoteOrCoin("One Euro Cent Coin", 1, NoteOrCoin.COIN)
 
 if USDollars.validate():
+    print("Currency verified!")
+else:
+    print("Currency invalid!")
+
+if Euros.validate():
     print("Currency verified!")
 else:
     print("Currency invalid!")
@@ -130,9 +152,15 @@ else:
 finished: bool = False
 
 while not finished:
+    eurosOrDollars = input("Euros or Dollars? (e/d) ")
+    if (eurosOrDollars == "e"):
+        currency = Euros
+    else:
+        currency = USDollars
+    
     amountInCurrency = input("How much should I pay out in this currency? ")
-    amountInUnits = USDollars.convertToUnits(float(amountInCurrency))
-    notesOrCoins = USDollars.payOut(amountInUnits)
+    amountInUnits = currency.convertToUnits(float(amountInCurrency))
+    notesOrCoins = currency.payOut(amountInUnits)
     
     if (notesOrCoins):    
         print("Pay out the following:")
