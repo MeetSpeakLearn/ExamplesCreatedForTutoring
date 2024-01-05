@@ -47,7 +47,7 @@ romanTokens = [{"symbol" : "M",
                 "value" : 1,
                 "maxRep" : 3}]
 
-romanMetaTokens = ["CM", "CD", "XL", "IX", "IV"]        # Numeral pairs seen as single tokens
+romanMetaTokens = ["CM", "CD", "XC", "XL", "IX", "IV"]        # Numeral pairs seen as single tokens
 
 def getTokenInfo(name: str):
     for info in romanTokens:
